@@ -1,7 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 module.exports = async (req, res) => {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', process.env.YOUR_DOMAIN || '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -21,8 +20,10 @@ module.exports = async (req, res) => {
         currency: 'eur',
         product_data: {
           name: item.name,
+          description: 'Maraud INC. — Offense and defense',
+          images: ['https://maraud-inc.xo.je/logo.jpg'],
         },
-        unit_amount: Math.round(item.price * 100), // cents
+        unit_amount: Math.round(item.price * 100),
       },
       quantity: item.qty,
     }));
@@ -31,6 +32,7 @@ module.exports = async (req, res) => {
       payment_method_types: ['card'],
       line_items,
       mode: 'payment',
+      allow_promotion_codes: true, // klant kan promo/gift code invoeren op Stripe pagina
       success_url: process.env.YOUR_DOMAIN + '/home?order=success',
       cancel_url: process.env.YOUR_DOMAIN + '/products?order=cancelled',
     });
